@@ -43,11 +43,27 @@ function NeuralParticles() {
 export default function Background3D() {
   return (
     <div className="fixed inset-0 -z-10 bg-obsidian">
-      <Canvas camera={{ position: [0, 0, 1] }}>
-        <NeuralParticles />
-        <ambientLight intensity={0.5} />
-      </Canvas>
+      <ErrorBoundary fallback={<div className="fixed inset-0 bg-obsidian" />}>
+        <Canvas camera={{ position: [0, 0, 1] }} gl={{ powerPreference: "low-power", antialias: false }}>
+          <NeuralParticles />
+          <ambientLight intensity={0.5} />
+        </Canvas>
+      </ErrorBoundary>
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-obsidian/50 to-obsidian" />
     </div>
   );
+}
+
+// Simple Error Boundary for Three.js crashes
+import React from 'react';
+class ErrorBoundary extends React.Component<{ children: React.ReactNode, fallback: React.ReactNode }, { hasError: boolean }> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
 }

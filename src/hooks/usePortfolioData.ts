@@ -73,8 +73,27 @@ const DEFAULT_DATA: PortfolioData = {
 
 export function usePortfolioData() {
   const [data, setData] = useState<PortfolioData>(() => {
-    const saved = localStorage.getItem('trivonix_data');
-    return saved ? JSON.parse(saved) : DEFAULT_DATA;
+    try {
+      const saved = localStorage.getItem('trivonix_data');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Ensure data follows the latest schema with defaults for safety
+        return {
+          ...DEFAULT_DATA,
+          ...parsed,
+          hero: { ...DEFAULT_DATA.hero, ...parsed.hero },
+          about: { 
+            ...DEFAULT_DATA.about, 
+            ...parsed.about,
+            stats: parsed.about?.stats || DEFAULT_DATA.about.stats 
+          },
+          projects: parsed.projects || DEFAULT_DATA.projects
+        };
+      }
+    } catch (e) {
+      console.error("Failed to parse portfolio data:", e);
+    }
+    return DEFAULT_DATA;
   });
 
   const updateData = (newData: Partial<PortfolioData> | ((prev: PortfolioData) => PortfolioData)) => {
