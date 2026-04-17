@@ -4,7 +4,16 @@ import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from '@google/genai';
 import { cn } from '@/src/lib/utils';
 
-const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY as string });
+// Initialize conditionally to prevent crash if key is missing
+let genAI: GoogleGenAI | null = null;
+try {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (apiKey && apiKey !== 'undefined') {
+    genAI = new GoogleGenAI({ apiKey });
+  }
+} catch (e) {
+  console.error("AI Initialization failed:", e);
+}
 
 interface Message {
   role: 'user' | 'ai';
@@ -21,6 +30,15 @@ export default function TJAgent({ onLoginRequest }: { onLoginRequest?: () => voi
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
+
+    if (!genAI) {
+      setMessages(prev => [...prev, 
+        { role: 'user', content: input },
+        { role: 'ai', content: "Neural authentication failed. Environment configuration incomplete." }
+      ]);
+      setInput('');
+      return;
+    }
 
     const userMsg = input.trim();
     setInput('');
@@ -43,7 +61,8 @@ export default function TJAgent({ onLoginRequest }: { onLoginRequest?: () => voi
         User context: ${userMsg}
       `;
 
-      const response = await genAI.models.generateContent({
+      if (!genAI) throw new Error("AI not initialized");
+      const response = await (genAI as any).models.generateContent({
         model,
         contents: prompt,
       });

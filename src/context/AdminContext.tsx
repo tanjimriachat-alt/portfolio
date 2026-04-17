@@ -14,13 +14,21 @@ const ADMIN_NUMBER = "01874816789";
 const ADMIN_PASSWORD = "TANJIMRIACHAT@";
 
 export function AdminProvider({ children }: { children: ReactNode }) {
-  const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem('trivonix_admin') === 'true');
+  const [isAdmin, setIsAdmin] = useState(() => {
+    try {
+      return localStorage.getItem('trivonix_admin') === 'true';
+    } catch (e) {
+      return false;
+    }
+  });
   const [isEditMode, setIsEditMode] = useState(false);
 
   const login = (number: string, pass: string) => {
     if (number === ADMIN_NUMBER && pass === ADMIN_PASSWORD) {
       setIsAdmin(true);
-      localStorage.setItem('trivonix_admin', 'true');
+      try {
+        localStorage.setItem('trivonix_admin', 'true');
+      } catch (e) {}
       return true;
     }
     return false;
@@ -29,7 +37,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setIsAdmin(false);
     setIsEditMode(false);
-    localStorage.removeItem('trivonix_admin');
+    try {
+      localStorage.removeItem('trivonix_admin');
+    } catch (e) {}
   };
 
   return (
