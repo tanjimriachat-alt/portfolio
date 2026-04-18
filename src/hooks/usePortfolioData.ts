@@ -33,32 +33,66 @@ export interface PortfolioData {
     description: string;
     stats: { label: string; val: string }[];
     dividerImage: string;
+    identity: {
+      fullName: string;
+      bloodGroup: string;
+      location: string;
+      philosophy: string;
+    };
+    education: {
+      current: string;
+      goal: string;
+    };
   };
   projects: Project[];
   research: ResearchItem[];
+  social: {
+    facebook: string;
+    whatsapp: string;
+    email: string;
+    youtube?: string;
+    github?: string;
+  };
 }
 
 const DEFAULT_DATA: PortfolioData = {
   hero: {
-    protocol: "NEURAL ARCHITECTURE PROTOCOL",
-    titleTop: "TRIVONIX",
-    titleMid: "X-LEVEL",
-    titleBottom: "SENTIENCE",
-    description: "A synthesis of futuristic engineering and cinematic visual logic. Architecting digital ecosystems that breathe with intelligence."
+    protocol: "CYBER SHIELD PROTOCOL",
+    titleTop: "TANJIM",
+    titleMid: "OMAR",
+    titleBottom: "TRIVONIX",
+    description: "HSC 2026 Science Candidate at Lakshmipur Govt College. Cyber Security Enthusiast & Anonymous Shield Agent."
+  },
+  social: {
+    facebook: "https://facebook.com/riachattanjim",
+    whatsapp: "01874816789",
+    email: "tanjimriachat@gmail.com",
+    youtube: "#",
+    github: "#"
   },
   about: {
-    profileTag: "ALPHA_CREATOR",
+    profileTag: "IDENTITY_SCAN_v4.0",
     profileImage: "https://storage.googleapis.com/static-files-prod/ais/ais-shared-prod-at-634/tanjimriachat_at_gmail_com/input_file_0.png",
-    titleTop: "ENGINEERING",
-    titleBottom: "TOMORROW",
-    description: "HSC 2026 Candidate. Future BUET Resident. Passionate about AI research, advanced robotics, and building digital worlds that challenge the status quo.",
+    titleTop: "ARCHITECTING",
+    titleBottom: "THE_FUTURE",
+    description: "Born Nov 27, 2007. Passionate about Kali Linux, defensive cyber security, and autonomous AI systems. A proactive leader serving as Institute Representative and a committed Rover Scout.",
     stats: [
-      { label: 'Neural Sync', val: '99.9%' },
-      { label: 'Uptime', val: '24/7' },
-      { label: 'Active Nodes', val: '12' },
+      { label: 'Neural Sync', val: 'SSC_2024' },
+      { label: 'Uptime', val: 'HSC_2026' },
+      { label: 'Active Nodes', val: 'VBD_LKP' },
       { label: 'Target Host', val: 'BUET' },
     ],
-    dividerImage: "https://storage.googleapis.com/static-files-prod/ais/ais-shared-prod-at-634/tanjimriachat_at_gmail_com/input_file_1.png"
+    dividerImage: "https://storage.googleapis.com/static-files-prod/ais/ais-shared-prod-at-634/tanjimriachat_at_gmail_com/input_file_1.png",
+    identity: {
+      fullName: "Riachat Tanjim Omar",
+      bloodGroup: "A (Negative)",
+      location: "Lakshmipur, Bangladesh",
+      philosophy: "Career First, Sentience Second."
+    },
+    education: {
+      current: "Lakshmipur Govt College",
+      goal: "BUET (CSE)"
+    }
   },
   projects: [
     {
@@ -111,6 +145,7 @@ export function usePortfolioData() {
           ...parsed,
           hero: { ...DEFAULT_DATA.hero, ...parsed.hero },
           about: { ...DEFAULT_DATA.about, ...parsed.about },
+          social: { ...DEFAULT_DATA.social, ...parsed.social },
           projects: parsed.projects || DEFAULT_DATA.projects,
           research: parsed.research || DEFAULT_DATA.research
         });
@@ -131,6 +166,7 @@ export function usePortfolioData() {
               ...cloudData.about,
               stats: cloudData.about?.stats || DEFAULT_DATA.about.stats 
             },
+            social: { ...DEFAULT_DATA.social, ...cloudData.social },
             projects: cloudData.projects || DEFAULT_DATA.projects,
             research: cloudData.research || DEFAULT_DATA.research
           };

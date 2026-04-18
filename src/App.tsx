@@ -1,22 +1,61 @@
 import { motion, useScroll, useTransform } from 'motion/react';
 import { useState, useRef } from 'react';
-import { Github, Linkedin, Mail, Cpu, Shield, Code, Globe, LogOut, Settings, RotateCcw, Image as ImageIcon } from 'lucide-react';
+import { Github, Youtube, Linkedin, Mail, Cpu, Shield, Code, Globe, LogOut, Settings, RotateCcw, Facebook, MessageCircle, Image as ImageIcon } from 'lucide-react';
 import Background3D from '@/src/components/Background3D';
 import Terminal from '@/src/components/Terminal';
 import TJAgent from '@/src/components/TJAgent';
 import ProjectCard from '@/src/components/ProjectCard';
 import CustomCursor from '@/src/components/CustomCursor';
 import AdminLogin from '@/src/components/AdminLogin';
+import SocialLinksEditor from '@/src/components/SocialLinksEditor';
 import EditableText from '@/src/components/EditableText';
 import { cn } from '@/src/lib/utils';
 import { useAdmin } from '@/src/context/AdminContext';
 import { usePortfolioData } from '@/src/hooks/usePortfolioData';
+
+interface SocialLinkProps {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  colorClass: string;
+  onEdit: () => void;
+  isEditMode: boolean;
+}
+
+function SocialLink({ href, icon, label, colorClass, onEdit, isEditMode }: SocialLinkProps) {
+  if (isEditMode) {
+    return (
+      <button 
+        onClick={onEdit}
+        className={cn("p-3 glass rounded-full transition-all border border-white/5 relative group", colorClass)}
+        title={`Edit ${label}`}
+      >
+        <div className="absolute -top-1 -right-1 w-3 h-3 bg-neon-aqua rounded-full flex items-center justify-center border border-obsidian">
+          <Settings size={6} className="text-obsidian" />
+        </div>
+        {icon}
+      </button>
+    );
+  }
+
+  return (
+    <a 
+      href={href === '#' ? undefined : href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn("p-3 glass rounded-full transition-all border border-white/5 group", colorClass)}
+    >
+      {icon}
+    </a>
+  );
+}
 
 export default function App() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { isEditMode, setIsEditMode, isAdmin, logout } = useAdmin();
   const { data, updateData, resetData } = usePortfolioData();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isSocialEditorOpen, setIsSocialEditorOpen] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -131,9 +170,14 @@ export default function App() {
               {item}
             </a>
           ))}
-          <a href="#" className="p-3 glass rounded-full hover:bg-neon-aqua/20 transition-all border-white/10 group">
-            <Github size={18} className="group-hover:text-neon-aqua" />
-          </a>
+          <SocialLink 
+            isEditMode={isEditMode}
+            href={data.social.github}
+            label="GitHub"
+            colorClass="hover:bg-neon-aqua/20"
+            icon={<Github size={18} className="group-hover:text-neon-aqua" />}
+            onEdit={() => setIsSocialEditorOpen(true)}
+          />
           {!isAdmin && (
             <button 
               onClick={() => setIsLoginOpen(true)}
@@ -235,7 +279,7 @@ export default function App() {
       </section>
 
       {/* Cinematic Portrait Divider */}
-      <section className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden z-0">
+      <section className="relative h-[70vh] md:h-[80vh] w-full overflow-hidden z-0">
         <motion.div 
           style={{ y: portraitY }}
           className="absolute inset-0 w-full h-[120%]"
@@ -244,7 +288,7 @@ export default function App() {
             src={data.about.dividerImage} 
             alt="Cinematic Battlestation" 
             referrerPolicy="no-referrer"
-            className="w-full h-full object-cover grayscale md:grayscale-0 opacity-40 md:opacity-60 brightness-[0.4] md:brightness-50"
+            className="w-full h-full object-cover grayscale opacity-50 md:opacity-60 brightness-[0.4] md:brightness-50 active:grayscale-0 active:opacity-100 transition-all duration-700"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-obsidian via-transparent to-obsidian" />
         </motion.div>
@@ -385,9 +429,36 @@ export default function App() {
             </div>
 
             <div className="grid grid-cols-2 gap-12 border-t border-white/5 pt-12">
+              <div className="space-y-4">
+                <div className="text-[10px] font-mono text-neon-aqua tracking-widest uppercase opacity-60">Identity_Core</div>
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-white/80">
+                    <EditableText 
+                      value={data.about.identity.fullName} 
+                      onChange={(val) => updateData(prev => ({ ...prev, about: { ...prev.about, identity: { ...prev.about.identity, fullName: val } } }))}
+                    />
+                  </div>
+                  <div className="text-[10px] text-white/30 font-mono">BLOOD: {data.about.identity.bloodGroup}</div>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="text-[10px] font-mono text-neon-violet tracking-widest uppercase opacity-60">Education_Node</div>
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-white/80">
+                    <EditableText 
+                      value={data.about.education.current} 
+                      onChange={(val) => updateData(prev => ({ ...prev, about: { ...prev.about, education: { ...prev.about.education, current: val } } }))}
+                    />
+                  </div>
+                  <div className="text-[10px] text-neon-aqua font-mono uppercase tracking-widest">AIM: {data.about.education.goal}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mt-12 pt-12 border-t border-white/5">
               {data.about.stats.map((stat, i) => (
                 <div key={i} className="group">
-                  <div className="text-3xl font-display font-bold mb-2 group-hover:text-neon-aqua transition-colors">
+                  <div className="text-2xl font-display font-bold mb-1 group-hover:text-neon-aqua transition-colors">
                     <EditableText 
                       value={stat.val} 
                       onChange={(val) => updateData(prev => {
@@ -397,7 +468,7 @@ export default function App() {
                       })}
                     />
                   </div>
-                  <div className="text-[10px] uppercase tracking-[0.3em] text-white/30">
+                  <div className="text-[8px] uppercase tracking-[0.2em] text-white/30">
                     <EditableText 
                       value={stat.label} 
                       onChange={(val) => updateData(prev => {
@@ -416,26 +487,26 @@ export default function App() {
             {/* Holographic ID Border */}
             <div className="absolute -inset-4 bg-gradient-to-tr from-neon-aqua/20 via-transparent to-neon-violet/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
             
-            <div className="aspect-[3/4] glass rounded-[40px] overflow-hidden border-neon-violet/20 md:hover:border-neon-aqua transition-all duration-700 relative shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+            <div className="aspect-[3/4] glass rounded-[40px] overflow-hidden border-neon-violet/20 group-active:border-neon-aqua md:hover:border-neon-aqua transition-all duration-700 relative shadow-[0_0_50px_rgba(0,0,0,0.5)]">
               {/* Vertical Scanner Line Animation */}
               <motion.div 
                 animate={{ top: ['-10%', '110%'] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                className="absolute left-0 right-0 h-[3px] bg-neon-aqua shadow-[0_0_20px_rgba(0,242,255,1)] z-10 opacity-60 md:opacity-70"
+                className="absolute left-0 right-0 h-[3px] bg-neon-aqua shadow-[0_0_20px_rgba(0,242,255,1)] z-10 opacity-40 md:opacity-70"
               />
               
               <img 
                 src={data.about.profileImage} 
                 alt="Riachat Tanjim Omar" 
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover md:grayscale md:opacity-40 md:group-hover:scale-105 md:group-hover:opacity-100 md:group-hover:grayscale-0 transition-all duration-[1.2s] ease-out"
+                className="w-full h-full object-cover grayscale opacity-40 md:opacity-40 group-active:scale-105 group-active:opacity-100 group-active:grayscale-0 md:group-hover:scale-105 md:group-hover:opacity-100 md:group-hover:grayscale-0 transition-all duration-[1.2s] ease-out"
               />
               
               {/* Overlay HUD elements - Fixed for mobile */}
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 bg-gradient-to-t from-obsidian via-obsidian/80 to-transparent">
                 <div className="flex justify-between items-end">
-                  <div>
-                    <div className="font-mono text-[7px] md:text-[8px] text-neon-aqua tracking-widest mb-1 uppercase">Identity_Scan</div>
+                  <div className="group-active:text-neon-aqua transition-colors">
+                    <div className="font-mono text-[7px] md:text-[8px] text-neon-aqua tracking-widest mb-1 uppercase opacity-60">Identity_Scan</div>
                     <div className="font-display font-bold text-base md:text-lg tracking-tight uppercase">R. TANJIM OMAR</div>
                   </div>
                   <div className="text-right">
@@ -472,19 +543,65 @@ export default function App() {
             CONNECT
           </h2>
           
-          <div className="flex flex-col md:flex-row items-center justify-center gap-12 mb-24">
-            <a href="mailto:tanjimriachat@gmail.com" className="group">
-              <div className="text-2xl font-display font-bold mb-2 group-hover:text-neon-aqua transition-colors italic leading-none">EMAIL_PROTOCOL</div>
-              <div className="text-white/40 font-light hover:text-white transition-colors">tanjimriachat@gmail.com</div>
-            </a>
-            <div className="h-[1px] w-20 bg-white/10 hidden md:block" />
-            <div className="flex gap-8">
-              <a href="#" className="p-4 glass rounded-full hover:bg-neon-aqua/20 transition-all group">
-                <Github size={24} className="group-hover:text-neon-aqua" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24 max-w-2xl mx-auto">
+            <div className="flex flex-col items-center">
+              <a href={`mailto:${data.social.email}`} className="group">
+                <div className="text-xl md:text-2xl font-display font-bold mb-2 group-hover:text-neon-aqua transition-colors italic leading-none">EMAIL_PROTOCOL</div>
+                <div className="text-white/40 font-light hover:text-white transition-colors text-sm">
+                  <EditableText 
+                    value={data.social.email} 
+                    onChange={(val) => updateData(prev => ({ ...prev, social: { ...prev.social, email: val } }))}
+                  />
+                </div>
               </a>
-              <a href="#" className="p-4 glass rounded-full hover:bg-neon-violet/20 transition-all group">
-                <Linkedin size={24} className="group-hover:text-neon-violet" />
-              </a>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="text-xl md:text-2xl font-display font-bold mb-4 text-white/20 italic tracking-tighter">NEURAL_LINKS</div>
+              <div className="flex flex-wrap justify-center gap-6">
+                <SocialLink 
+                  isEditMode={isEditMode}
+                  href={data.social.github}
+                  label="GitHub"
+                  colorClass="hover:bg-neon-aqua/20"
+                  icon={<Github size={20} className="group-hover:text-neon-aqua text-white/60" />}
+                  onEdit={() => setIsSocialEditorOpen(true)}
+                />
+                <SocialLink 
+                  isEditMode={isEditMode}
+                  href={data.social.facebook}
+                  label="Facebook"
+                  colorClass="hover:bg-blue-500/20"
+                  icon={<Facebook size={20} className="group-hover:text-blue-400 text-white/60" />}
+                  onEdit={() => setIsSocialEditorOpen(true)}
+                />
+                <SocialLink 
+                  isEditMode={isEditMode}
+                  href={data.social.whatsapp === '#' ? '#' : `https://wa.me/${data.social.whatsapp.replace(/\D/g,'')}`}
+                  label="WhatsApp"
+                  colorClass="hover:bg-green-500/20"
+                  icon={<MessageCircle size={20} className="group-hover:text-green-400 text-white/60" />}
+                  onEdit={() => setIsSocialEditorOpen(true)}
+                />
+                <SocialLink 
+                  isEditMode={isEditMode}
+                  href={data.social.youtube || '#'}
+                  label="YouTube"
+                  colorClass="hover:bg-red-500/20"
+                  icon={<Youtube size={20} className="group-hover:text-red-500 text-white/60" />}
+                  onEdit={() => setIsSocialEditorOpen(true)}
+                />
+              </div>
+
+              {isEditMode && (
+                <div className="mt-8">
+                  <button 
+                    onClick={() => setIsSocialEditorOpen(true)}
+                    className="text-[9px] font-mono text-neon-aqua/60 hover:text-neon-aqua underline tracking-[0.2em] transition-colors"
+                  >
+                    CONFIGURE_ALL_LINKS
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -501,6 +618,12 @@ export default function App() {
 
       <Terminal onLoginRequest={() => setIsLoginOpen(true)} />
       <AdminLogin isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+      <SocialLinksEditor 
+        isOpen={isSocialEditorOpen}
+        onClose={() => setIsSocialEditorOpen(false)}
+        data={data.social}
+        onSave={(newSocial) => updateData(prev => ({ ...prev, social: newSocial }))}
+      />
     </div>
   );
 }
