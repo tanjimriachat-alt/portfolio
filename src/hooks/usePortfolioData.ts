@@ -32,6 +32,7 @@ export interface PortfolioData {
     titleBottom: string;
     description: string;
     stats: { label: string; val: string }[];
+    dividerImage: string;
   };
   projects: Project[];
   research: ResearchItem[];
@@ -56,7 +57,8 @@ const DEFAULT_DATA: PortfolioData = {
       { label: 'Uptime', val: '24/7' },
       { label: 'Active Nodes', val: '12' },
       { label: 'Target Host', val: 'BUET' },
-    ]
+    ],
+    dividerImage: "https://storage.googleapis.com/static-files-prod/ais/ais-shared-prod-at-634/tanjimriachat_at_gmail_com/input_file_1.png"
   },
   projects: [
     {

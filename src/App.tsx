@@ -34,11 +34,11 @@ export default function App() {
 
       {/* Admin Toolbar */}
       {isAdmin && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-4 glass px-6 py-3 rounded-full border-neon-aqua/30 shadow-[0_0_30px_rgba(0,242,255,0.1)]">
-          <div className="flex items-center gap-3 pr-4 border-r border-white/10">
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-2 md:gap-4 glass px-4 md:px-6 py-3 rounded-full border-neon-aqua/30 shadow-[0_0_30px_rgba(0,242,255,0.1)] scale-90 md:scale-100">
+          <div className="flex items-center gap-2 md:gap-3 pr-2 md:pr-4 border-r border-white/10">
             <div className={cn("w-2 h-2 rounded-full", isEditMode ? "bg-neon-aqua animate-pulse" : "bg-white/20")} />
-            <span className="text-[9px] font-mono tracking-widest uppercase">
-              {isEditMode ? "Mode: Editing" : "Mode: Restricted"}
+            <span className="text-[7px] md:text-[9px] font-mono tracking-widest uppercase">
+              {isEditMode ? "Edit" : "Rel"}
             </span>
           </div>
           <button 
@@ -49,16 +49,17 @@ export default function App() {
             )}
             title="Toggle Edit Mode"
           >
-            <Settings size={16} />
+            <Settings size={14} />
           </button>
           {isEditMode && (
             <div className="flex items-center gap-2">
+              {/* Profile Image Upload */}
               <button 
                 onClick={() => document.getElementById('profile-upload')?.click()}
                 className="p-2 rounded-lg hover:bg-neon-aqua/20 text-neon-aqua transition-colors"
-                title="Upload from Device"
+                title="Upload Profile Photo"
               >
-                <ImageIcon size={16} />
+                <ImageIcon size={14} />
               </button>
               <input 
                 id="profile-upload"
@@ -72,6 +73,32 @@ export default function App() {
                     reader.onloadend = () => {
                       const base64String = reader.result as string;
                       updateData(prev => ({ ...prev, about: { ...prev.about, profileImage: base64String } }));
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
+
+              {/* Cinematic Divider Upload */}
+              <button 
+                onClick={() => document.getElementById('divider-upload')?.click()}
+                className="p-2 rounded-lg hover:bg-neon-violet/20 text-neon-violet transition-colors"
+                title="Upload Cinematic Divider"
+              >
+                <Globe size={14} />
+              </button>
+              <input 
+                id="divider-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      const base64String = reader.result as string;
+                      updateData(prev => ({ ...prev, about: { ...prev.about, dividerImage: base64String } }));
                     };
                     reader.readAsDataURL(file);
                   }
@@ -130,7 +157,7 @@ export default function App() {
             />
           </div>
           
-          <h1 className="text-[12vw] md:text-[8vw] font-display font-black leading-[0.85] tracking-tighter uppercase">
+          <div className="text-[12vw] md:text-[8vw] font-display font-black leading-[0.85] tracking-tighter uppercase">
             <span className="block text-white">
               <EditableText 
                 value={data.hero.titleTop} 
@@ -149,7 +176,7 @@ export default function App() {
                 onChange={(val) => updateData(prev => ({ ...prev, hero: { ...prev.hero, titleBottom: val } }))}
               />
             </span>
-          </h1>
+          </div>
 
           <div className="mt-12 max-w-lg mx-auto">
             <div className="text-sm md:text-base text-white/40 leading-relaxed font-light tracking-wide italic">
@@ -208,16 +235,16 @@ export default function App() {
       </section>
 
       {/* Cinematic Portrait Divider */}
-      <section className="relative h-[80vh] w-full overflow-hidden z-0">
+      <section className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden z-0">
         <motion.div 
           style={{ y: portraitY }}
           className="absolute inset-0 w-full h-[120%]"
         >
           <img 
-            src={data.about.profileImage} 
-            alt="Cinematic Portrait" 
+            src={data.about.dividerImage} 
+            alt="Cinematic Battlestation" 
             referrerPolicy="no-referrer"
-            className="w-full h-full object-cover grayscale opacity-60 brightness-50"
+            className="w-full h-full object-cover grayscale md:grayscale-0 opacity-40 md:opacity-60 brightness-[0.4] md:brightness-50"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-obsidian via-transparent to-obsidian" />
         </motion.div>
@@ -227,10 +254,10 @@ export default function App() {
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.5 }}
-            className="text-center"
+            className="text-center px-8"
           >
-            <span className="font-mono text-[10px] tracking-[1em] text-neon-aqua uppercase mb-6 block opacity-50">EYE_OF_THE_ARCHITECT</span>
-            <h2 className="text-[10vw] font-display font-black tracking-tighter uppercase opacity-20">SENTIENCE</h2>
+            <span className="font-mono text-[8px] md:text-[10px] tracking-[0.6em] md:tracking-[1em] text-neon-aqua uppercase mb-6 block opacity-50">SYNAPTIC_ENVIRONMENT</span>
+            <h2 className="text-[12vw] md:text-[10vw] font-display font-black tracking-tighter uppercase opacity-20">ENGINE</h2>
           </motion.div>
         </div>
       </section>
@@ -245,9 +272,9 @@ export default function App() {
               <span className="font-mono text-[10px] tracking-[0.6em] text-neon-aqua uppercase mb-4 block">DATABASE_QUERY</span>
               <h2 className="text-6xl md:text-8xl font-display font-black tracking-tighter uppercase italic">RESEARCH</h2>
             </div>
-            <p className="max-w-xs text-xs text-white/30 uppercase tracking-[0.3em] leading-loose text-right">
+            <div className="max-w-xs text-xs text-white/30 uppercase tracking-[0.3em] leading-loose text-right">
               SYSTEMATIC EXPLORATION OF NEURAL FRONTIERS AND ROBOTIC KINEMATICS.
-            </p>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -263,7 +290,7 @@ export default function App() {
                   <span className="text-[10px] font-mono text-neon-aqua/40 tracking-widest">{item.date}</span>
                 </div>
 
-                <span className="inline-block px-3 py-1 rounded-full bg-white/5 text-[9px] font-mono tracking-widest text-white/40 mb-8 border border-white/10">
+                <div className="inline-block px-3 py-1 rounded-full bg-white/5 text-[9px] font-mono tracking-widest text-white/40 mb-8 border border-white/10">
                   <EditableText 
                     value={item.category} 
                     onChange={(val) => updateData(prev => {
@@ -272,9 +299,9 @@ export default function App() {
                       return { ...prev, research: newResearch };
                     })}
                   />
-                </span>
+                </div>
 
-                <h4 className="text-2xl md:text-3xl font-display font-bold leading-tight mb-6 group-hover:text-neon-aqua transition-colors">
+                <div className="text-2xl md:text-3xl font-display font-bold leading-tight mb-6 group-hover:text-neon-aqua transition-colors">
                   <EditableText 
                     value={item.title} 
                     onChange={(val) => updateData(prev => {
@@ -283,9 +310,9 @@ export default function App() {
                       return { ...prev, research: newResearch };
                     })}
                   />
-                </h4>
+                </div>
 
-                <p className="text-sm text-white/40 font-light italic leading-relaxed mb-10">
+                <div className="text-sm text-white/40 font-light italic leading-relaxed mb-10">
                   <EditableText 
                     multiline
                     value={item.excerpt} 
@@ -295,7 +322,7 @@ export default function App() {
                       return { ...prev, research: newResearch };
                     })}
                   />
-                </p>
+                </div>
 
                 <div className="flex items-center gap-4 text-[10px] font-mono tracking-[0.3em] text-white/20 group-hover:text-neon-aqua transition-colors cursor-pointer">
                   <span>READ_FULL_LOG</span>
@@ -330,13 +357,13 @@ export default function App() {
       <section id="about" className="py-40 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
           <div>
-            <span className="font-mono text-xs text-neon-aqua tracking-[0.4em] uppercase mb-8 block">
+            <div className="font-mono text-xs text-neon-aqua tracking-[0.4em] uppercase mb-8 block">
               <EditableText 
                 value={data.about.profileTag} 
                 onChange={(val) => updateData(prev => ({ ...prev, about: { ...prev.about, profileTag: val } }))}
               />
-            </span>
-            <h3 className="text-4xl md:text-6xl font-display font-bold leading-tight mb-12">
+            </div>
+            <div className="text-4xl md:text-6xl font-display font-bold leading-tight mb-12">
               <EditableText 
                 value={data.about.titleTop} 
                 onChange={(val) => updateData(prev => ({ ...prev, about: { ...prev.about, titleTop: val } }))}
@@ -348,7 +375,7 @@ export default function App() {
                   onChange={(val) => updateData(prev => ({ ...prev, about: { ...prev.about, titleBottom: val } }))}
                 />
               </span>
-            </h3>
+            </div>
             <div className="text-lg text-white/50 leading-relaxed max-w-xl font-light italic mb-16">
               <EditableText 
                 multiline
@@ -389,31 +416,31 @@ export default function App() {
             {/* Holographic ID Border */}
             <div className="absolute -inset-4 bg-gradient-to-tr from-neon-aqua/20 via-transparent to-neon-violet/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
             
-            <div className="aspect-[3/4] glass rounded-[40px] overflow-hidden border-neon-violet/20 hover:border-neon-aqua transition-all duration-700 relative shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+            <div className="aspect-[3/4] glass rounded-[40px] overflow-hidden border-neon-violet/20 md:hover:border-neon-aqua transition-all duration-700 relative shadow-[0_0_50px_rgba(0,0,0,0.5)]">
               {/* Vertical Scanner Line Animation */}
               <motion.div 
                 animate={{ top: ['-10%', '110%'] }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: "linear" }}
-                className="absolute left-0 right-0 h-[3px] bg-neon-aqua shadow-[0_0_20px_rgba(0,242,255,1)] z-10 opacity-70"
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                className="absolute left-0 right-0 h-[3px] bg-neon-aqua shadow-[0_0_20px_rgba(0,242,255,1)] z-10 opacity-60 md:opacity-70"
               />
               
               <img 
                 src={data.about.profileImage} 
                 alt="Riachat Tanjim Omar" 
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover grayscale opacity-40 group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-[1.2s] ease-out"
+                className="w-full h-full object-cover md:grayscale md:opacity-40 md:group-hover:scale-105 md:group-hover:opacity-100 md:group-hover:grayscale-0 transition-all duration-[1.2s] ease-out"
               />
               
-              {/* Overlay HUD elements */}
-              <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-obsidian/90 to-transparent">
+              {/* Overlay HUD elements - Fixed for mobile */}
+              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 bg-gradient-to-t from-obsidian via-obsidian/80 to-transparent">
                 <div className="flex justify-between items-end">
                   <div>
-                    <div className="font-mono text-[8px] text-neon-aqua tracking-widest mb-1 uppercase">Identity_Scan</div>
-                    <div className="font-display font-bold text-lg tracking-tight uppercase">R. TANJIM OMAR</div>
+                    <div className="font-mono text-[7px] md:text-[8px] text-neon-aqua tracking-widest mb-1 uppercase">Identity_Scan</div>
+                    <div className="font-display font-bold text-base md:text-lg tracking-tight uppercase">R. TANJIM OMAR</div>
                   </div>
                   <div className="text-right">
-                    <div className="font-mono text-[8px] text-white/30 tracking-widest mb-1 uppercase">Class</div>
-                    <div className="font-mono text-[10px] text-neon-violet font-bold">ALPHA_CREATOR</div>
+                    <div className="font-mono text-[7px] md:text-[8px] text-white/30 tracking-widest mb-1 uppercase">Class</div>
+                    <div className="font-mono text-[9px] md:text-[10px] text-neon-violet font-bold">ALPHA_CREATOR</div>
                   </div>
                 </div>
               </div>
