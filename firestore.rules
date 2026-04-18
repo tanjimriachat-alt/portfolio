@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && 
+             request.auth.token.email == "tanjimriachat@gmail.com" && 
+             request.auth.token.email_verified == true;
+    }
+
+    // Portfolio configuration
+    match /configs/portfolio {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

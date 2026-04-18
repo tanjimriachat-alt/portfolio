@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { db, doc, onSnapshot, setDoc } from '../lib/firebase';
 
 export interface Project {
   title: string;
@@ -72,41 +73,70 @@ const DEFAULT_DATA: PortfolioData = {
 };
 
 export function usePortfolioData() {
-  const [data, setData] = useState<PortfolioData>(() => {
+  const [data, setData] = useState<PortfolioData>(DEFAULT_DATA);
+
+  useEffect(() => {
+    // Local fallback for initial load speed
     try {
       const saved = localStorage.getItem('trivonix_data');
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Ensure data follows the latest schema with defaults for safety
-        return {
+        setData({
           ...DEFAULT_DATA,
           ...parsed,
           hero: { ...DEFAULT_DATA.hero, ...parsed.hero },
-          about: { 
-            ...DEFAULT_DATA.about, 
-            ...parsed.about,
-            stats: parsed.about?.stats || DEFAULT_DATA.about.stats 
-          },
+          about: { ...DEFAULT_DATA.about, ...parsed.about },
           projects: parsed.projects || DEFAULT_DATA.projects
-        };
+        });
       }
-    } catch (e) {
-      console.error("Failed to parse portfolio data:", e);
-    }
-    return DEFAULT_DATA;
-  });
+    } catch (e) {}
 
-  const updateData = (newData: Partial<PortfolioData> | ((prev: PortfolioData) => PortfolioData)) => {
+    // Cloud Real-time Synchronization
+    const unsub = onSnapshot(doc(db, 'configs', 'portfolio'), (snap) => {
+      if (snap.exists()) {
+        const cloudData = snap.data() as PortfolioData;
+        setData(prev => {
+          const merged = {
+            ...DEFAULT_DATA,
+            ...cloudData,
+            hero: { ...DEFAULT_DATA.hero, ...cloudData.hero },
+            about: { 
+              ...DEFAULT_DATA.about, 
+              ...cloudData.about,
+              stats: cloudData.about?.stats || DEFAULT_DATA.about.stats 
+            },
+            projects: cloudData.projects || DEFAULT_DATA.projects
+          };
+          localStorage.setItem('trivonix_data', JSON.stringify(merged));
+          return merged;
+        });
+      }
+    });
+
+    return unsub;
+  }, []);
+
+  const updateData = async (newData: Partial<PortfolioData> | ((prev: PortfolioData) => PortfolioData)) => {
     setData(prev => {
       const merged = typeof newData === 'function' ? newData(prev) : { ...prev, ...newData };
+      
+      // Update local storage
       localStorage.setItem('trivonix_data', JSON.stringify(merged));
+      
+      // Persist to Cloud
+      setDoc(doc(db, 'configs', 'portfolio'), {
+        ...merged,
+        updatedAt: new Date().toISOString()
+      }).catch(err => console.error("Cloud Sync Failed:", err));
+
       return merged;
     });
   };
 
-  const resetData = () => {
+  const resetData = async () => {
     setData(DEFAULT_DATA);
     localStorage.removeItem('trivonix_data');
+    await setDoc(doc(db, 'configs', 'portfolio'), DEFAULT_DATA);
   };
 
   return { data, updateData, resetData };

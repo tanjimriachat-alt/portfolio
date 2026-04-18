@@ -1,0 +1,62 @@
+{
+  "entities": {
+    "Portfolio": {
+      "title": "Portfolio Data",
+      "description": "Schema for the entire portfolio content",
+      "type": "object",
+      "properties": {
+        "hero": {
+          "type": "object",
+          "properties": {
+            "protocol": { "type": "string" },
+            "titleTop": { "type": "string" },
+            "titleMid": { "type": "string" },
+            "titleBottom": { "type": "string" },
+            "description": { "type": "string" }
+          }
+        },
+        "about": {
+          "type": "object",
+          "properties": {
+            "profileTag": { "type": "string" },
+            "profileImage": { "type": "string" },
+            "titleTop": { "type": "string" },
+            "titleBottom": { "type": "string" },
+            "description": { "type": "string" },
+            "stats": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "label": { "type": "string" },
+                  "val": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "description": { "type": "string" },
+              "tags": { "type": "array", "items": { "type": "string" } },
+              "image": { "type": "string" },
+              "large": { "type": "boolean" }
+            }
+          }
+        },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["hero", "about", "projects"]
+    }
+  },
+  "firestore": {
+    "configs/portfolio": {
+      "schema": "Portfolio",
+      "description": "The master document containing all portfolio information"
+    }
+  }
+}

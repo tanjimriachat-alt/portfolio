@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Lock, X, LogIn } from 'lucide-react';
+import { Lock, X, LogIn, Globe } from 'lucide-react';
 import { useAdmin } from '@/src/context/AdminContext';
 
 export default function AdminLogin({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const { login } = useAdmin();
+  const { login, loginWithGoogle } = useAdmin();
   const [number, setNumber] = useState('');
   const [pass, setPass] = useState('');
   const [error, setError] = useState(false);
@@ -88,6 +88,25 @@ export default function AdminLogin({ isOpen, onClose }: { isOpen: boolean; onClo
               >
                 <LogIn size={20} />
                 AUTHORIZE
+              </button>
+
+              <div className="relative my-8">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10" /></div>
+                <div className="relative flex justify-center text-[10px] uppercase tracking-[0.2em] text-white/20">
+                  <span className="px-4 bg-obsidian">OR</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  await loginWithGoogle();
+                  onClose();
+                }}
+                className="w-full py-5 bg-white/5 border border-white/10 text-white font-display font-bold tracking-[0.2em] rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-3 active:scale-95"
+              >
+                <Globe size={18} className="text-neon-aqua" />
+                CLOUD_SYNC_AUTH
               </button>
             </form>
           </motion.div>
