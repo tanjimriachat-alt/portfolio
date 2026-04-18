@@ -52,27 +52,32 @@ export default function App() {
             <Settings size={16} />
           </button>
           {isEditMode && (
-            <button 
-              onClick={() => {
-                const url = prompt("Enter Image URL:", data.about.profileImage);
-                if (url) updateData(prev => ({ ...prev, about: { ...prev.about, profileImage: url } }));
-              }}
-              className="p-2 rounded-lg hover:bg-neon-aqua/20 text-neon-aqua transition-colors"
-              title="Update Profile Image"
-            >
-              <ImageIcon size={16} />
-            </button>
-          )}
-          {isEditMode && (
-            <button 
-              onClick={() => {
-                if(confirm("Factory reset all data? This cannot be undone.")) resetData();
-              }}
-              className="p-2 rounded-lg hover:bg-red-500/20 text-red-400 transition-colors"
-              title="Reset to Factory Defaults"
-            >
-              <RotateCcw size={16} />
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => document.getElementById('profile-upload')?.click()}
+                className="p-2 rounded-lg hover:bg-neon-aqua/20 text-neon-aqua transition-colors"
+                title="Upload from Device"
+              >
+                <ImageIcon size={16} />
+              </button>
+              <input 
+                id="profile-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      const base64String = reader.result as string;
+                      updateData(prev => ({ ...prev, about: { ...prev.about, profileImage: base64String } }));
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
+            </div>
           )}
           <button 
             onClick={logout}
@@ -90,7 +95,7 @@ export default function App() {
           <span className="font-display font-black text-2xl tracking-tighter italic text-glow-aqua">TRIVONIX</span>
         </div>
         <div className="hidden md:flex gap-12 pointer-events-auto items-center">
-          {['Projects', 'About', 'Contact'].map((item) => (
+          {['Projects', 'Research', 'About', 'Contact'].map((item) => (
             <a 
               key={item} 
               href={`#${item.toLowerCase()}`}
@@ -230,6 +235,97 @@ export default function App() {
         </div>
       </section>
 
+      {/* Research / Blog Section */}
+      <section id="research" className="py-40 px-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-neon-aqua/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2" />
+        
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row items-end justify-between mb-24 gap-12">
+            <div>
+              <span className="font-mono text-[10px] tracking-[0.6em] text-neon-aqua uppercase mb-4 block">DATABASE_QUERY</span>
+              <h2 className="text-6xl md:text-8xl font-display font-black tracking-tighter uppercase italic">RESEARCH</h2>
+            </div>
+            <p className="max-w-xs text-xs text-white/30 uppercase tracking-[0.3em] leading-loose text-right">
+              SYSTEMATIC EXPLORATION OF NEURAL FRONTIERS AND ROBOTIC KINEMATICS.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            {data.research.map((item, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="group relative p-12 glass rounded-[32px] border-white/5 hover:border-neon-aqua/30 transition-all duration-500 overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 p-8">
+                  <span className="text-[10px] font-mono text-neon-aqua/40 tracking-widest">{item.date}</span>
+                </div>
+
+                <span className="inline-block px-3 py-1 rounded-full bg-white/5 text-[9px] font-mono tracking-widest text-white/40 mb-8 border border-white/10">
+                  <EditableText 
+                    value={item.category} 
+                    onChange={(val) => updateData(prev => {
+                      const newResearch = [...prev.research];
+                      newResearch[i] = { ...newResearch[i], category: val };
+                      return { ...prev, research: newResearch };
+                    })}
+                  />
+                </span>
+
+                <h4 className="text-2xl md:text-3xl font-display font-bold leading-tight mb-6 group-hover:text-neon-aqua transition-colors">
+                  <EditableText 
+                    value={item.title} 
+                    onChange={(val) => updateData(prev => {
+                      const newResearch = [...prev.research];
+                      newResearch[i] = { ...newResearch[i], title: val };
+                      return { ...prev, research: newResearch };
+                    })}
+                  />
+                </h4>
+
+                <p className="text-sm text-white/40 font-light italic leading-relaxed mb-10">
+                  <EditableText 
+                    multiline
+                    value={item.excerpt} 
+                    onChange={(val) => updateData(prev => {
+                      const newResearch = [...prev.research];
+                      newResearch[i] = { ...newResearch[i], excerpt: val };
+                      return { ...prev, research: newResearch };
+                    })}
+                  />
+                </p>
+
+                <div className="flex items-center gap-4 text-[10px] font-mono tracking-[0.3em] text-white/20 group-hover:text-neon-aqua transition-colors cursor-pointer">
+                  <span>READ_FULL_LOG</span>
+                  <div className="w-12 h-[1px] bg-white/10 group-hover:bg-neon-aqua transition-all group-hover:w-20" />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {isEditMode && (
+            <div className="mt-12 flex justify-center">
+              <button 
+                onClick={() => updateData(prev => ({
+                  ...prev,
+                  research: [...prev.research, {
+                    title: "NEW RESEARCH LOG",
+                    category: "DATA_CORE",
+                    date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase(),
+                    excerpt: "Initiating new research protocol documentation..."
+                  }]
+                }))}
+                className="px-8 py-4 glass rounded-full border-neon-aqua/20 text-neon-aqua font-mono text-xs tracking-widest hover:bg-neon-aqua/10 transition-all"
+              >
+                + ADD_RESEARCH_ENTRY
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* About / Status Section */}
       <section id="about" className="py-40 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
@@ -290,18 +386,51 @@ export default function App() {
           </div>
 
           <div className="relative group">
-            <div className="aspect-[3/4] glass rounded-[40px] overflow-hidden border-neon-violet/20 hover:border-neon-aqua/40 transition-all duration-700">
+            {/* Holographic ID Border */}
+            <div className="absolute -inset-4 bg-gradient-to-tr from-neon-aqua/20 via-transparent to-neon-violet/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+            
+            <div className="aspect-[3/4] glass rounded-[40px] overflow-hidden border-neon-violet/20 hover:border-neon-aqua transition-all duration-700 relative shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+              {/* Vertical Scanner Line Animation */}
+              <motion.div 
+                animate={{ top: ['-10%', '110%'] }}
+                transition={{ duration: 3.5, repeat: Infinity, ease: "linear" }}
+                className="absolute left-0 right-0 h-[3px] bg-neon-aqua shadow-[0_0_20px_rgba(0,242,255,1)] z-10 opacity-70"
+              />
+              
               <img 
                 src={data.about.profileImage} 
-                alt="Architecture" 
+                alt="Riachat Tanjim Omar" 
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover grayscale opacity-40 group-hover:scale-110 group-hover:opacity-60 transition-all duration-[2s]"
+                className="w-full h-full object-cover grayscale opacity-40 group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-[1.2s] ease-out"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-transparent to-transparent opacity-80" />
+              
+              {/* Overlay HUD elements */}
+              <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-obsidian/90 to-transparent">
+                <div className="flex justify-between items-end">
+                  <div>
+                    <div className="font-mono text-[8px] text-neon-aqua tracking-widest mb-1 uppercase">Identity_Scan</div>
+                    <div className="font-display font-bold text-lg tracking-tight uppercase">R. TANJIM OMAR</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-mono text-[8px] text-white/30 tracking-widest mb-1 uppercase">Class</div>
+                    <div className="font-mono text-[10px] text-neon-violet font-bold">ALPHA_CREATOR</div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="absolute -top-10 -right-10 glass p-8 rounded-3xl border-white/5 backdrop-blur-3xl hidden md:block">
-              <div className="font-mono text-[9px] text-neon-aqua mb-2 tracking-[0.3em]">LOC: DHAKA_BD</div>
-              <div className="font-mono text-[9px] text-white/40 tracking-[0.3em]">SYST_INIT: 2024</div>
+            
+            <div className="absolute -top-12 -right-8 glass p-6 rounded-2xl border-white/5 backdrop-blur-3xl hidden md:block group-hover:scale-110 transition-transform duration-500">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-neon-aqua animate-pulse" />
+                  <span className="font-mono text-[9px] tracking-[0.2em] text-white/60">LIVE_DATA_FEED</span>
+                </div>
+                <div className="h-[1px] w-full bg-white/10" />
+                <div className="space-y-1">
+                  <div className="text-[8px] font-mono text-white/30 tracking-widest uppercase">Encryption</div>
+                  <div className="text-[9px] font-mono text-neon-aqua">TRIVONIX_v4.2</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

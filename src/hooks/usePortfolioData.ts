@@ -9,6 +9,14 @@ export interface Project {
   large?: boolean;
 }
 
+export interface ResearchItem {
+  title: string;
+  category: string;
+  date: string;
+  excerpt: string;
+  link?: string;
+}
+
 export interface PortfolioData {
   hero: {
     protocol: string;
@@ -26,6 +34,7 @@ export interface PortfolioData {
     stats: { label: string; val: string }[];
   };
   projects: Project[];
+  research: ResearchItem[];
 }
 
 const DEFAULT_DATA: PortfolioData = {
@@ -37,8 +46,8 @@ const DEFAULT_DATA: PortfolioData = {
     description: "A synthesis of futuristic engineering and cinematic visual logic. Architecting digital ecosystems that breathe with intelligence."
   },
   about: {
-    profileTag: "DEVELOPER_PROFILE",
-    profileImage: "https://picsum.photos/seed/developer/1920/1080?grayscale",
+    profileTag: "ALPHA_CREATOR",
+    profileImage: "https://storage.googleapis.com/static-files-prod/ais/ais-shared-prod-at-634/tanjimriachat_at_gmail_com/input_file_0.png",
     titleTop: "ENGINEERING",
     titleBottom: "TOMORROW",
     description: "HSC 2026 Candidate. Future BUET Resident. Passionate about AI research, advanced robotics, and building digital worlds that challenge the status quo.",
@@ -69,6 +78,20 @@ const DEFAULT_DATA: PortfolioData = {
       tags: ["Framer Motion", "Three.js", "CSS Grid"],
       image: "https://picsum.photos/seed/uidesign/800/600",
     },
+  ],
+  research: [
+    {
+      title: "Neural Pathways in Robotic Sentience",
+      category: "ROBOTICS",
+      date: "APR 2026",
+      excerpt: "Exploring the intersection of LLMs and physical robotics, focusing on low-latency neural feedback loops."
+    },
+    {
+      title: "The Architecture of Tomorrow",
+      category: "AI_RESEARCH",
+      date: "MAR 2026",
+      excerpt: "A deep dive into decentralised intelligence and the role of Bangladesh in the global AI landscape."
+    }
   ]
 };
 
@@ -86,7 +109,8 @@ export function usePortfolioData() {
           ...parsed,
           hero: { ...DEFAULT_DATA.hero, ...parsed.hero },
           about: { ...DEFAULT_DATA.about, ...parsed.about },
-          projects: parsed.projects || DEFAULT_DATA.projects
+          projects: parsed.projects || DEFAULT_DATA.projects,
+          research: parsed.research || DEFAULT_DATA.research
         });
       }
     } catch (e) {}
@@ -105,7 +129,8 @@ export function usePortfolioData() {
               ...cloudData.about,
               stats: cloudData.about?.stats || DEFAULT_DATA.about.stats 
             },
-            projects: cloudData.projects || DEFAULT_DATA.projects
+            projects: cloudData.projects || DEFAULT_DATA.projects,
+            research: cloudData.research || DEFAULT_DATA.research
           };
           localStorage.setItem('trivonix_data', JSON.stringify(merged));
           return merged;

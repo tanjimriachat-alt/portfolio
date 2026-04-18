@@ -48,9 +48,22 @@
             }
           }
         },
+        "research": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "category": { "type": "string" },
+              "date": { "type": "string" },
+              "excerpt": { "type": "string" },
+              "link": { "type": "string" }
+            }
+          }
+        },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["hero", "about", "projects"]
+      "required": ["hero", "about", "projects", "research"]
     }
   },
   "firestore": {
